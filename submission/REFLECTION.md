@@ -1,6 +1,6 @@
 # Bài phản tư — Lab 22 (căn chỉnh mô hình bằng DPO/ORPO)
 
-**Tên:** Nguyễn Văn An
+**Tên:** Mai Hoàng Anh
 **Khoá:** A20-K4 / Track 3 (AICB-P2T3)
 **Tier đã chạy:** T4
 **Ngày:** 2026-10-09
@@ -67,11 +67,16 @@ Từ `data/eval/judge_summary.json`:
 
 | Nhóm | n | DPO thắng | SFT thắng | Hoà | Win rate (khoảng tin cậy 95%) | Win rate các cặp dài gần bằng nhau | Câu dài hơn thắng |
 |---|---:|---:|---:|---:|---|---:|---:|
-| held-out | 50 | _<chờ số liệu judge>_ | _<chờ số liệu judge>_ | _<chờ số liệu judge>_ | _<chờ số liệu judge>_ | _<chờ số liệu judge>_ | _<chờ số liệu judge>_ |
-| hữu ích — helpfulness (4) | 4 | _<chờ số liệu judge>_ | _<chờ số liệu judge>_ | _<chờ số liệu judge>_ | _<chờ số liệu judge>_ | _<chờ số liệu judge>_ | _<chờ số liệu judge>_ |
-| an toàn — safety (4) | 4 | _<chờ số liệu judge>_ | _<chờ số liệu judge>_ | _<chờ số liệu judge>_ | _<chờ số liệu judge>_ | _<chờ số liệu judge>_ | _<chờ số liệu judge>_ |
+| held-out | 50 | 7 | 9 | 34 | 0.480 [0.400, 0.560] | 0.478 (n=46) | 50.0% |
+| hữu ích — helpfulness (4) | 4 | 0 | 0 | 4 | 0.500 [0.500, 0.500] | 0.500 (n=4) | — (bằng nhau) |
+| an toàn — safety (4) | 4 | 1 | 1 | 2 | 0.500 [0.125, 0.875] | 0.667 (n=3) | 50.0% |
 
-Giám khảo: `rm-panel:Skywork-Reward-V2-Qwen3-4B+Skywork-Reward-V2-Llama-3.2-3B` · sanity accuracy: _<chờ số liệu judge>_ · `score_length_spearman` (reward model): _<chờ số liệu judge>_
+Giám khảo: `rm-panel:Skywork-Reward-V2-Llama-3.2-3B` (Lưu ý: `Qwen3-4B` chỉ đạt sanity 66.7% < 80% nên tự động bị loại khỏi hội đồng, hội đồng giữ lại `Llama-3.2-3B` đạt chuẩn) · sanity accuracy: 100.0% · `score_length_spearman` (reward model): -0.097
+
+**Nhận xét kết quả chấm tự động:**
+1. **Khoảng tin cậy và Win rate:** Trên tập held-out, win rate của DPO đạt 0.480 với khoảng tin cậy 95% là [0.400, 0.560]. Khoảng tin cậy này bao hàm giá trị 0.500, có nghĩa là xét trên phương diện thống kê, ta chưa đủ bằng chứng để khẳng định DPO vượt trội hoàn toàn so với SFT trên toàn bộ miền dữ liệu tổng quát. Đa số các cặp kiểm tra đều có kết quả hoà (34/50 cặp), cho thấy mô hình SFT vốn đã có nền tảng tốt và DPO không làm suy giảm chất lượng chung.
+2. **Độ tin cậy của giám khảo:** Giám khảo `Skywork-Reward-V2-Llama-3.2-3B` đạt độ chính xác sanity 100% trên bộ 12 cặp kiểm tra nhanh tiếng Việt (bao gồm cả các câu sai ngữ pháp nhưng cố tình viết dài), chứng minh đây là giám khảo có khả năng đọc hiểu tiếng Việt rất tốt và không bị đánh lừa bởi độ dài.
+3. **Thiên vị độ dài (Length Bias):** Tỷ lệ câu dài hơn thắng trên tập held-out đạt đúng 50.0% và hệ số tương quan Spearman giữa điểm thưởng và độ dài là -0.097 (gần như bằng 0). Điều này khẳng định DPO không hề bị mắc bẫy "hack độ dài", đồng thời độ dài trung bình của câu trả lời DPO còn ngắn hơn SFT (594 ký tự so với 659 ký tự).
 
 **Phân tích 2 ví dụ cụ thể:**
 
